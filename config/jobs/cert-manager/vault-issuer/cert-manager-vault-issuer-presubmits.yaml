@@ -1,0 +1,88 @@
+presubmits:
+  cert-manager/vault-issuer:
+    - name: pull-cert-manager-vault-issuer-verify
+      decorate: true
+      always_run: true
+      labels:
+        preset-go-cache: "true"
+        preset-local-cache: "true"
+      spec:
+        containers:
+          - image: europe-west1-docker.pkg.dev/cert-manager-tests-trusted/cert-manager-infra-images/make-dind:20260529-7f372af-trixie
+            args:
+              - runner
+              - make
+              - vendor-go
+              - verify
+            resources:
+              requests:
+                cpu: 1
+                memory: 1Gi
+        dnsPolicy: None
+        branches:
+          - migrate-in-tree-vault
+        always_run: true
+        optional: false
+        dnsConfig:
+          nameservers:
+            - 8.8.8.8
+            - 8.8.4.4
+    - name: pull-cert-manager-vault-issuer-test
+      decorate: true
+      always_run: true
+      labels:
+        preset-go-cache: "true"
+        preset-local-cache: "true"
+      spec:
+        containers:
+          - image: europe-west1-docker.pkg.dev/cert-manager-tests-trusted/cert-manager-infra-images/make-dind:20260529-7f372af-trixie
+            args:
+              - runner
+              - make
+              - vendor-go
+              - test-unit
+            resources:
+              requests:
+                cpu: 1
+                memory: 1Gi
+        branches:
+          - migrate-in-tree-vault
+        always_run: true
+        optional: false
+        dnsPolicy: None
+        dnsConfig:
+          nameservers:
+            - 8.8.8.8
+            - 8.8.4.4
+    - name: pull-cert-manager-vault-issuer-e2e
+      decorate: true
+      always_run: true
+      labels:
+        preset-go-cache: "true"
+        preset-local-cache: "true"
+        preset-dind-enabled: "true"
+      spec:
+        containers:
+          - image: europe-west1-docker.pkg.dev/cert-manager-tests-trusted/cert-manager-infra-images/make-dind:20260120-8648794-trixie
+            args:
+              - runner
+              - make
+              - vendor-go
+              - test-e2e
+            resources:
+              requests:
+                cpu: 3500m
+                memory: 4Gi
+            securityContext:
+              privileged: true
+              capabilities:
+                add: ["SYS_ADMIN"]
+        branches:
+          - migrate-in-tree-vault
+        always_run: true
+        optional: false
+        dnsPolicy: None
+        dnsConfig:
+          nameservers:
+            - 8.8.8.8
+            - 8.8.4.4
